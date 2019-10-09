@@ -2,11 +2,9 @@
 
 Minimal Alpine Linux Docker image with `sshd` exposed and `borg backup` installed.
 
-Mount your .ssh credentials (RSA public keys) at `/root/.ssh/` in order to
-access the container via root and set `SSH_ENABLE_ROOT=true` or mount each user's key in
-`/etc/authorized_keys/<username>` and set `SSH_USERS` config to create user accounts (see below).
+Mount the space for your Borg repositories at `/borg` and set `BORG_USERS` environment variable to create user accounts (see below).
 
-Optionally mount a custom sshd config at `/etc/ssh/`.
+Optionally mount a custom sshd config at `/etc/ssh/`. You can also mount the host keys at `/etc/ssh/keys` so they don't change at each run (see below).
 
 ## Environment Options
 
