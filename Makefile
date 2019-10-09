@@ -1,4 +1,4 @@
-NAME := ssh-borg
+NAME := sshd-borg
 TAG := latest
 IMAGE_NAME := vajsravana/$(NAME)
 
