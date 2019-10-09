@@ -62,36 +62,6 @@ if [ -w /etc/authorized_keys ]; then
     find /etc/authorized_keys/ -type f -exec chmod 644 {} \;
 fi
 
-# Add users if SSH_USERS=user:uid:gid set
-if [ -n "${SSH_USERS}" ]; then
-    USERS=$(echo $SSH_USERS | tr "," "\n")
-    for U in $USERS; do
-        IFS=':' read -ra UA <<< "$U"
-        _NAME=${UA[0]}
-        _UID=${UA[1]}
-        _GID=${UA[2]}
-
-        echo ">> Adding user ${_NAME} with uid: ${_UID}, gid: ${_GID}."
-        if [ ! -e "/etc/authorized_keys/${_NAME}" ]; then
-            echo "WARNING: No SSH authorized_keys found for ${_NAME}!"
-        fi
-        getent group ${_NAME} >/dev/null 2>&1 || groupadd -g ${_GID} ${_NAME}
-        getent passwd ${_NAME} >/dev/null 2>&1 || useradd -r -m -p '' -u ${_UID} -g ${_GID} -s '' -c 'SSHD User' ${_NAME}
-    done
-else
-    # Warn if no authorized_keys
-    if [ ! -e ~/.ssh/authorized_keys ] && [ ! $(ls -A /etc/authorized_keys) ]; then
-        echo "WARNING: No SSH authorized_keys found!"
-    fi
-fi
-
-# Unlock root account, if enabled
-if [[ "${SSH_ENABLE_ROOT}" == "true" ]]; then
-    usermod -p '' root
-else
-    echo "WARNING: root account is now locked by default. Set SSH_USERS to unlock the account."
-fi
-
 # Update MOTD
 if [ -v MOTD ]; then
     echo -e "$MOTD" > /etc/motd
@@ -127,6 +97,25 @@ stop() {
     # All done.
     echo "Done."
 }
+
+# Add users if BORG_USERS=user:keytype:key:keycomment user:keytype:key:keycomment ...
+if [ -n "${BORG_USERS}" ]; then
+    for user in $BORG_USERS; do
+        username=`echo $user | cut -d ':' -f1`
+        ssh_pkey=`echo $user | cut -d ':' -f2-4 | tr ':' ' '`
+        echo ">> Adding user $username with public key $ssh_pkey"
+        adduser -h /home/$username $username -s /bin/sh -G users -D $username
+        mkdir -p /home/$username/.ssh
+        echo "command=\"borg serve --restrict-to-repository /borg/$username\",restrict $ssh_pkey" >/home/$username/.ssh/authorized_keys
+        chown $username:users /home/$username/.ssh/authorized_keys
+        chmod 600 /home/$username/.ssh/authorized_keys
+        usermod -p '*' $username
+    done
+else
+    # Warn if no users
+    echo "WARNING: No user created, because BORG_USERS variable is missing or empty "
+    echo "Pass a BORG_USERS variable like this: 'user1:keytype1:key1:keycomment1 user2:keytype2:key2:keycomment2 ...'"
+fi
 
 echo "Running $@"
 if [ "$(basename $1)" == "$DAEMON" ]; then

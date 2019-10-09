@@ -1,6 +1,6 @@
 # SSHD
 
-Minimal Alpine Linux Docker image with `sshd` exposed and `rsync` installed.
+Minimal Alpine Linux Docker image with `sshd` exposed and `borg backup` installed.
 
 Mount your .ssh credentials (RSA public keys) at `/root/.ssh/` in order to
 access the container via root and set `SSH_ENABLE_ROOT=true` or mount each user's key in
@@ -10,11 +10,8 @@ Optionally mount a custom sshd config at `/etc/ssh/`.
 
 ## Environment Options
 
-- `SSH_USERS` list of user accounts and uids/gids to create. eg `SSH_USERS=www:48:48,admin:1000:1000`
-- `SSH_ENABLE_ROOT` if "true" unlock the root account
+- `BORG_USERS` list of user accounts with public keys. e.g. `BORG_USERS='foo:ssh-rsa:LONGSSHPUBKEY:foo@foo.net bar:ssh-rsa:ANOTHERPUBSSHKEY:bar@bar.net'`
 - `MOTD` change the login message
-- `SFTP_MODE` if "true" sshd will only accept sftp connections
-- `SFTP_CHROOT` if in sftp only mode sftp will be chrooted to this directory. Default "/data"
 - `GATEWAY_PORTS` if "true" sshd will allow gateway ports (port forwardings not bound to the loopback address)
 
 ## SSH Host Keys
@@ -25,24 +22,18 @@ By default this image will create new host keys in `/etc/ssh/keys` which should 
 
 If you wish to configure SSH entirely with environment variables it is suggested that you externally mount `/etc/ssh/keys` instead of `/etc/ssh`.
 
-## SFTP mode
-
-When in sftp only mode (activated by setting `SFTP_MODE=true` the container will only accept sftp connections. All sftp actions will be chrooted to the `SFTP_CHROOT` directory which defaults to "/data".
-
-Please note that all components of the pathname in the ChrootDirectory directive must be root-owned directories that are not writable by any other user or group (see man 5 sshd_config).
-
 ## Usage Example
 
 ```
-docker run -d -p 2222:22 -v /secrets/id_rsa.pub:/root/.ssh/authorized_keys -v /mnt/data/:/data/ -e SSH_ENABLE_ROOT=true docker.io/panubo/sshd:1.0.3
+docker run -d -p 2222:22 --mount type=bind,source=/share/borg,target=/borg --mount type=bind,source=/path/to/keys,target=/etc/ssh/keys -e BORG_USERS='jamestkirk:ssh-rsa:AAAAB3Nza......EWg4E0w==:jim@enterprise
 ```
 
-or
+## Acknowledgements and thanks
 
-```
-docker run -d -p 2222:22 -v $(pwd)/.ssh/id_rsa.pub:/etc/authorized_keys/www -e SSH_USERS="www:48:48" docker.io/panubo/sshd:1.0.3
-```
+Thanks go to the author of the image, exposing ssh and rsync, by [Panubo](https://github.com/panubo), who did most of the work. I added borg-backup, remove some features and modified the user creation part. You can find the original work at https://github.com/panubo/docker-sshd
 
 ## Status
 
-Production ready and stable.
+Under development right now! Use at your own risk!
+
+

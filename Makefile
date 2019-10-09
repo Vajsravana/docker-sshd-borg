@@ -1,6 +1,6 @@
-NAME := sshd
+NAME := ssh-borg
 TAG := latest
-IMAGE_NAME := panubo/$(NAME)
+IMAGE_NAME := vajsravana/$(NAME)
 
 .PHONY: help build push clean
 
