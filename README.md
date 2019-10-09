@@ -25,7 +25,7 @@ If you wish to configure SSH entirely with environment variables it is suggested
 ## Usage Example
 
 ```
-docker run -d -p 2222:22 --mount type=bind,source=/share/borg,target=/borg --mount type=bind,source=/path/to/keys,target=/etc/ssh/keys -e BORG_USERS='jamestkirk:ssh-rsa:AAAAB3Nza......EWg4E0w==:jim@enterprise
+docker run -d -p 2222:22 --mount type=bind,source=/share/borg,target=/borg --mount type=bind,source=/path/to/keys,target=/etc/ssh/keys -e BORG_USERS='jamestkirk:ssh-rsa:AAAAB3Nza......EWg4E0w==:jim@enterprise' docker.io/vajsravana/sshd-borg:0.1
 ```
 
 ## Acknowledgements and thanks
