@@ -1,4 +1,4 @@
-# SSHD
+# SSHD-Borg
 
 Minimal Alpine Linux Docker image with `sshd` exposed and `borg backup` installed.
 
