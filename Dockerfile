@@ -1,4 +1,4 @@
-FROM docker.io/alpine:3.10
+FROM docker.io/alpine:3.13
 
 RUN apk update && \
     apk add borgbackup bash git openssh augeas shadow && \

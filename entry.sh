@@ -103,8 +103,12 @@ if [ -n "${BORG_USERS}" ]; then
     for user in $BORG_USERS; do
         username=`echo $user | cut -d ':' -f1`
         ssh_pkey=`echo $user | cut -d ':' -f2-4 | tr ':' ' '`
-        echo ">> Adding user $username with public key $ssh_pkey"
-        adduser -h /home/$username $username -s /bin/sh -G users -D $username
+        if id "$username" >/dev/null 2>&1; then
+            echo ">> Updating key for user $username"
+        else
+            echo ">> Adding user $username"
+            adduser -h /home/$username $username -s /bin/sh -G users -D $username
+        fi
         mkdir -p /home/$username/.ssh
         echo "command=\"borg serve --restrict-to-repository /borg/$username\",restrict $ssh_pkey" >/home/$username/.ssh/authorized_keys
         chown $username:users /home/$username/.ssh/authorized_keys

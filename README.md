@@ -28,10 +28,9 @@ docker run -d -p 2222:22 --mount type=bind,source=/share/borg,target=/borg --mou
 
 ## Acknowledgements and thanks
 
-Thanks go to the author of the image, exposing ssh and rsync, by [Panubo](https://github.com/panubo), who did most of the work. I added borg-backup, remove some features and modified the user creation part. You can find the original work at https://github.com/panubo/docker-sshd
+Thanks go to the author of the image, exposing ssh and rsync, by [Panubo](https://github.com/panubo), who did most of the work. I added borg-backup, removed some features and modified the user creation part. You can find the original work at https://github.com/panubo/docker-sshd
 
 ## Status
 
 Under development right now! Use at your own risk!
-
 
